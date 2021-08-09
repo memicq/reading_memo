@@ -1,12 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_memo/blocs/session_bloc.dart';
 import 'package:reading_memo/resources/models/ios_machine_identifier.dart';
+import 'package:reading_memo/resources/models/session_state.dart';
 import 'package:reading_memo/resources/models/tab_page.dart';
-import 'package:reading_memo/styles/color_const.dart';
-import 'package:reading_memo/widgets/screen/bookshelf_screen.dart';
-import 'package:reading_memo/widgets/screen/home_screen.dart';
-import 'package:reading_memo/widgets/screen/search_screen.dart';
-import 'package:reading_memo/widgets/screen/account_screen.dart';
+import 'package:reading_memo/widgets/screens/account_screen.dart';
+import 'package:reading_memo/widgets/screens/bookshelf_screen.dart';
+import 'package:reading_memo/widgets/screens/home_screen.dart';
+import 'package:reading_memo/widgets/screens/sign_in_screen.dart';
+import 'package:reading_memo/widgets/styles/color_const.dart';
 
 class MainLayout extends StatefulWidget {
   @override
@@ -14,8 +18,8 @@ class MainLayout extends StatefulWidget {
 }
 
 class MainLayoutState extends State<MainLayout>{
-
-  bool needBottomSpace = true;
+  bool _needBottomSpace = true;
+  bool shouldShowSignInScreen = false;
 
   int currentPage = 0;
   Map<int, TabPage> pages = {
@@ -32,12 +36,6 @@ class MainLayoutState extends State<MainLayout>{
         screenWidget: BookshelfScreen()
     ),
     2: TabPage(
-        title: "見つける",
-        baseIcon: Icons.search_outlined,
-        activeIcon: Icons.search_rounded,
-        screenWidget: SearchScreen()
-    ),
-    3: TabPage(
         title: "アカウント",
         baseIcon: Icons.account_circle_outlined,
         activeIcon: Icons.account_circle_rounded,
@@ -45,20 +43,30 @@ class MainLayoutState extends State<MainLayout>{
     )
   };
 
-
   @override
   void initState() {
     super.initState();
-    fetchDeviceInfo();
+    this._init();
   }
 
-  Future<void> fetchDeviceInfo() async {
+  Future<void> _init() async {
+    await _fetchDeviceInfo();
+  }
+
+  Future<void> _fetchDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     String machineIdentifier = iosInfo.utsname.machine;
     IosMachineIdentifier machineVer = IosMachineIdentifierExt.from(machineIdentifier);
     setState(() {
-      this.needBottomSpace = machineVer.existBottomBar();
+      this._needBottomSpace = machineVer.existBottomBar();
+    });
+  }
+
+  void _checkLoginStateAfterBuild() {
+    print('MainLayout._checkLoginStateAfterBuild - ${shouldShowSignInScreen}');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (shouldShowSignInScreen) SignInScreen.open(context, callback: (){});
     });
   }
 
@@ -102,7 +110,7 @@ class MainLayoutState extends State<MainLayout>{
       return buildBottomTabItem(entry.value, entry.key);
     }).toList();
 
-    double bottomSpacePx = (this.needBottomSpace) ? 20.0 : 0.0;
+    double bottomSpacePx = (this._needBottomSpace) ? 20.0 : 0.0;
     double heightPx = 60.0 + bottomSpacePx;
 
     return Container(
@@ -124,23 +132,49 @@ class MainLayoutState extends State<MainLayout>{
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        backgroundColor: ColorConst.backgroundColor,
-        fontFamily: 'Noto Sans JP',
-      ),
-      home: Scaffold(
-        body: Container(
-          child: Column(
-            children: [
-              Expanded(child: pages[currentPage].screenWidget),
-              buildBottomTab()
-            ],
-          ),
+  Widget buildNotLoggedInView() {
+    return Scaffold(
+      body: Container(
+        child: Center(
+          child: Text("You're not logged in."),
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SessionBloc _bloc = Provider.of<SessionBloc>(context);
+
+    return StreamBuilder<SessionState>(
+        stream: _bloc.currentStateStream,
+        // initialData: SessionState(msg: 'initialData'),
+        builder: (BuildContext context, AsyncSnapshot<SessionState> snapshot) {
+            if (!snapshot.hasData) {
+              print("no snapshot");
+              return Container();
+            }
+
+            SessionState _session = snapshot.data;
+            print('MainLayout.build - $_session');
+            shouldShowSignInScreen = _session.shouldShowSignInScreen();
+            _checkLoginStateAfterBuild();
+
+            if (shouldShowSignInScreen) return buildNotLoggedInView();
+
+            return Scaffold(
+              body: Container(
+                child: Center(
+                  child: Column(
+                    children: [
+                      Expanded(child: pages[currentPage].screenWidget),
+                      buildBottomTab()
+                    ],
+                  ),
+                ),
+              ),
+            );
+        }
     );
   }
 }

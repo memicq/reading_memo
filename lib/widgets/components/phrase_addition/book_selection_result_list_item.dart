@@ -10,7 +10,7 @@ class BookSelectionResultListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _bloc = Provider.of<PhraseAdditionBloc>(context);
+    final _bloc = Provider.of<PhraseAdditionBloc>(context, listen: false);
 
     return Container(
       width: double.infinity,
@@ -38,9 +38,9 @@ class BookSelectionResultListItem extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(this.item.title),
-                          Text(this.item.author),
-                          Text(this.item.publisherName),
+                          Text(this.item.title, overflow: TextOverflow.ellipsis),
+                          Text(this.item.author, overflow: TextOverflow.ellipsis),
+                          Text(this.item.publisherName, overflow: TextOverflow.ellipsis),
                         ],
                       ),
                     ),

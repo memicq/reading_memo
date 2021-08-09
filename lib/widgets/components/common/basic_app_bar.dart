@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:reading_memo/styles/color_const.dart';
-import 'package:reading_memo/styles/text_style_const.dart';
+import 'package:reading_memo/widgets/styles/color_const.dart';
+import 'package:reading_memo/widgets/styles/text_style_const.dart';
 
 class BasicAppBar extends StatelessWidget with PreferredSizeWidget {
   String title;

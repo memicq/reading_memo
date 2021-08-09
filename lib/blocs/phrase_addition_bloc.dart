@@ -1,22 +1,51 @@
 import 'package:reading_memo/resources/models/book_selection_item.dart';
-import 'package:reading_memo/resources/models/phrase_addition_view.dart';
 import 'package:reading_memo/resources/models/rakuten_books_search_api_request.dart';
 import 'package:reading_memo/resources/models/rakuten_books_search_api_result.dart';
+import 'package:reading_memo/resources/models/session_state.dart';
+import 'package:reading_memo/resources/models/tables/book_row.dart';
+import 'package:reading_memo/resources/models/tables/phrase_row.dart';
+import 'package:reading_memo/resources/models/views/phrase_addition/book_search_result.dart';
+import 'package:reading_memo/resources/repositories/phrase_repository.dart';
 import 'package:reading_memo/resources/repositories/rakuten_books_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class PhraseAdditionBloc {
   RakutenBooksRepository _rakutenBooksRepository = RakutenBooksRepository();
+  PhraseRepository _phraseRepository = PhraseRepository();
 
-  final _bookSearchResultPublishSubject = PublishSubject<PhraseAdditionView>();
-  Stream<PhraseAdditionView> get bookSearchResultStream => _bookSearchResultPublishSubject.stream;
+  // publish subjects
+  final _isBookSelectingPs = PublishSubject<bool>();
+  final _bookSearchResultPs = PublishSubject<BookSearchResult>();
+  final _selectedItemPs = PublishSubject<BookSelectionItem>();
+  final _phraseTextPs = PublishSubject<String>();
 
-  PhraseAdditionView _view = PhraseAdditionView();
+  // stream
+  Stream<bool> get isBookSelectingStream => _isBookSelectingPs.stream;
+  Stream<BookSearchResult> get bookSearchResultStream => _bookSearchResultPs.stream;
+  Stream<BookSelectionItem> get selectedItemStream => _selectedItemPs.stream;
+  Stream<String> get phraseTextStream => _phraseTextPs.stream;
 
-  PhraseAdditionBloc(){}
+  // initialization
+  bool _isBookSelecting = true;
+  BookSearchResult _result = BookSearchResult();
+  BookSelectionItem _selectedItem;
+  String _phraseText = "";
+
+  SessionState _currentSession;
+
+  PhraseAdditionBloc(SessionState currentSession){
+    _currentSession = currentSession;
+  }
+
+  void fetchSelectedItem() {
+    _selectedItemPs.sink.add(_selectedItem);
+  }
 
   void dispose() {
-    _bookSearchResultPublishSubject.close();
+    _isBookSelectingPs.close();
+    _bookSearchResultPs.close();
+    _selectedItemPs.close();
+    _phraseTextPs.close();
   }
 
   Future<void> searchBooks(String query) async {
@@ -26,13 +55,46 @@ class PhraseAdditionBloc {
     List<BookSelectionItem> items = result.items.map((i) =>
         BookSelectionItem.fromRakutenBooksSearchApiResultItem(i)).toList();
 
-    _view.bookSearchResult = items;
-    _bookSearchResultPublishSubject.sink.add(_view);
+    _result.isSearchedOnce = true;
+    _result.items = items;
+    _bookSearchResultPs.sink.add(_result);
   }
 
   void selectBookItem(BookSelectionItem item) {
-    _view.selectedItem = item;
-    _bookSearchResultPublishSubject.sink.add(_view);
+    _isBookSelecting = false;
+    _isBookSelectingPs.sink.add(_isBookSelecting);
+    _selectedItem = item;
+    _selectedItemPs.sink.add(_selectedItem);
   }
 
+  void updatePhraseText(String text) {
+    _phraseText = text;
+    _phraseTextPs.sink.add(_phraseText);
+  }
+
+  Future<void> savePhraseText() async {
+    BookRow _book = BookRow(
+        generateId: true,
+        isbnCode10: _selectedItem.isbn,
+        isbnCode13: null,
+        bookTitle: _selectedItem.title,
+        authors: _selectedItem.author.split(','),
+        referenceUrl: _selectedItem.itemUrl,
+        imageUrl: _selectedItem.largeImageUrl,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now()
+    );
+
+    PhraseRow _phrase = PhraseRow(
+        generateId: true,
+        quotedText: _phraseText,
+        pageNumber: '123',
+        bookId: _book.bookId,
+        postedUserId: _currentSession.user.userId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now()
+    );
+
+    await _phraseRepository.create(_phrase, _book);
+  }
 }

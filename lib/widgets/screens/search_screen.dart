@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:reading_memo/styles/text_style_const.dart';
 import 'package:reading_memo/widgets/components/search/search_box.dart';
+import 'package:reading_memo/widgets/styles/text_style_const.dart';
 
 class SearchScreen extends StatelessWidget {
   @override

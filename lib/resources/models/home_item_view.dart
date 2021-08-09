@@ -1,21 +1,23 @@
 import 'package:flutter/foundation.dart';
 
-class HomeItemView {
+class HomeItem {
   String phraseId;
   String quotedText;
   String bookTitle;
-  String authorName;
+  String imageUrl;
+  List<String> authorNames;
   DateTime createdAt;
 
   String postedUserId;
   String postedUserName;
   String postedUserDisplayName;
 
-  HomeItemView({
+  HomeItem({
     @required this.phraseId,
     @required this.quotedText,
     @required this.bookTitle,
-    @required this.authorName,
+    @required this.imageUrl,
+    @required this.authorNames,
     @required this.createdAt,
     @required this.postedUserId,
     @required this.postedUserName,
