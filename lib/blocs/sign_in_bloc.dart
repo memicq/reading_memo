@@ -1,8 +1,6 @@
 class SignInBloc {
-  SignInBloc(){
-  }
+  SignInBloc();
 
   void dispose() {
-    
   }
 }

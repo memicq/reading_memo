@@ -8,45 +8,62 @@ import 'package:reading_memo/resources/repositories/user_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SessionBloc {
-  UserRepository _userRepository = UserRepository();
+  // singleton: シングルトンパターン
+  static final SessionBloc _instance = SessionBloc._internal();
 
-  final _currentStateBehaviourSubject = BehaviorSubject<SessionState>.seeded(SessionState(msg: 'initialData'));
-  Stream<SessionState> get currentStateStream => _currentStateBehaviourSubject.stream;
+  factory SessionBloc() => _instance;
 
-  SessionState _currentState;
-  SessionState get currentState => _currentState;
-
-  SessionBloc() {
+  SessionBloc._internal() {
+    print('SessionBloc.constructor');
     checkInitialSessionState();
   }
 
+  UserRepository _userRepository = UserRepository();
+
+  final _currentStateBehaviourSubject =
+      BehaviorSubject<SessionState>.seeded(SessionState(msg: 'initialData'));
+
+  Stream<SessionState> get currentStateStream =>
+      _currentStateBehaviourSubject.stream;
+
+  SessionState _currentState;
+
+  SessionState get currentState => _currentState;
+
   Future<void> checkInitialSessionState() async {
+    print('SessionBloc.checkInitialSessionState');
     User _user = FirebaseAuth.instance.currentUser;
     if (_user != null) {
       UserRow _currentUser = await _userRepository.getByEmail(_user.email);
-      _currentState = SessionState(isFetchedOnce: true, user: _currentUser, msg: 'nonInitialData');
+      _currentState = SessionState(
+          isLoading: false, user: _currentUser, msg: 'nonInitialData');
     } else {
-      _currentState = SessionState(isFetchedOnce: true, user: null, msg: 'nonInitialData');
+      _currentState =
+          SessionState(isLoading: false, user: null, msg: 'nonInitialData');
     }
     print('SessionBloc.init - $_currentState');
     _currentStateBehaviourSubject.sink.add(_currentState);
   }
 
   void signIn(LoginType loginType) async {
+    print('SessionBloc.signIn');
     switch (loginType) {
       case LoginType.GOOGLE:
-        UserRow _currentUser = await _signInWithErrorHandle(doSignIn: _signInWithGoogle);
-        _currentState = SessionState(isFetchedOnce: true, user: _currentUser, msg: 'signIn');
+        UserRow _currentUser =
+            await _signInWithErrorHandle(doSignIn: _signInWithGoogle);
+        _currentState =
+            SessionState(isLoading: false, user: _currentUser, msg: 'signIn');
         _currentStateBehaviourSubject.sink.add(_currentState);
         break;
       default:
-        _currentState = SessionState(isFetchedOnce: true, msg: 'signIn');
+        _currentState = SessionState(isLoading: false, msg: 'signIn');
         _currentStateBehaviourSubject.sink.add(_currentState);
         print("not implemented");
     }
   }
 
-  Future<UserRow> _signInWithErrorHandle({@required Future<UserCredential> Function() doSignIn}) async {
+  Future<UserRow> _signInWithErrorHandle(
+      {@required Future<UserCredential> Function() doSignIn}) async {
     try {
       UserCredential userCredential = await doSignIn();
       return await _upsertUserRow(userCredential);
@@ -63,9 +80,7 @@ class SessionBloc {
     final googleUser = await GoogleSignIn(scopes: ['email']).signIn();
     final googleAuth = await googleUser.authentication;
     final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken
-    );
+        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
@@ -81,8 +96,7 @@ class SessionBloc {
           displayName: userCredential.user.displayName,
           loginType: LoginType.GOOGLE,
           createdAt: DateTime.now(),
-          updatedAt: DateTime.now()
-      );
+          updatedAt: DateTime.now());
       await _userRepository.create(_user);
     }
 
@@ -91,8 +105,8 @@ class SessionBloc {
 
   void signOut() async {
     await FirebaseAuth.instance.signOut();
-    UserRow _currentUser;
-    _currentState = SessionState(isFetchedOnce: true, user: _currentUser);
+    _currentState = SessionState(isLoading: false, user: null);
+    _currentStateBehaviourSubject.sink.add(_currentState);
   }
 
   void dispose() {

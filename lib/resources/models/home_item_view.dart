@@ -23,4 +23,7 @@ class HomeItem {
     @required this.postedUserName,
     @required this.postedUserDisplayName
   });
+
+  @override
+  String toString() => 'HomeItem<phraseId=$phraseId, quotedText=$quotedText, bookTitle=$bookTitle>';
 }

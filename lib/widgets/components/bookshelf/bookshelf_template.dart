@@ -7,9 +7,32 @@ class BookshelfTemplate extends StatelessWidget {
     return Scaffold(
       appBar: BasicAppBar(title: "本棚"),
       body: Container(
-        child: Center(
-          child: Text("bookshelf"),
+        width: double.infinity,
+        child: Column(
+          children: [
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+            AaaCard(),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class AaaCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(10),
+        child: Center(child: Text("aaa")),
       ),
     );
   }

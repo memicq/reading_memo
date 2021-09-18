@@ -10,18 +10,20 @@ class HomeListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            border: const Border(
-                top: const BorderSide(color: Colors.black12, width: 0.25),
-                bottom: const BorderSide(color: Colors.black12, width: 0.25))),
-        child: Column(
-          children: [
-            HomeItemHeader(item: this.item),
-            HomeItemContent(item: this.item)
-          ],
-        )
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: const Border(
+              top: const BorderSide(color: Colors.black12, width: 0.25),
+              bottom: const BorderSide(color: Colors.black12, width: 0.25))),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          HomeItemHeader(item: this.item),
+          HomeItemContent(item: this.item),
+        ],
+      ),
     );
   }
 }

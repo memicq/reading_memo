@@ -1,14 +1,14 @@
 import 'package:reading_memo/resources/models/tables/user_row.dart';
 
 class SessionState {
-  bool isFetchedOnce;
+  bool isLoading;
   UserRow user;
   String msg;
 
-  SessionState({this.isFetchedOnce = false, this.user = null, this.msg = ''});
+  SessionState({this.isLoading = true, this.user = null, this.msg = ''});
 
-  bool shouldShowSignInScreen() => this.isFetchedOnce && this.user == null;
+  bool shouldShowSignInScreen() => !this.isLoading && this.user == null;
 
   @override
-  String toString() => 'SessionState<$isFetchedOnce:$user:$msg>';
+  String toString() => 'SessionState<isLoading=$isLoading, user=$user, msg=$msg>';
 }

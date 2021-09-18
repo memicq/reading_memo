@@ -93,5 +93,5 @@ class RakutenBooksSearchApiResultItem {
         this.booksGenreId = map['booksGenreId'];
 
   @override
-  String toString() => "RakutenBooksApiResultItem<$title:$author:$publisherName:$isbn>";
+  String toString() => "RakutenBooksApiResultItem<title=$title, author=$author, publishedName=$publisherName, isbn:$isbn>";
 }

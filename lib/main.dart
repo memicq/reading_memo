@@ -8,13 +8,13 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   runApp(
-      MaterialApp(
-          theme: ThemeData(
-            backgroundColor: ColorConst.backgroundColor,
-            fontFamily: 'Noto Sans JP',
-          ),
-          home: SessionHandler()
-      )
+    MaterialApp(
+      theme: ThemeData(
+        backgroundColor: ColorConst.backgroundColor,
+        fontFamily: 'Noto Sans JP',
+      ),
+      home: SessionHandler(),
+    ),
   );
 }
 

@@ -1,23 +1,24 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:reading_memo/blocs/global/session_bloc.dart';
 import 'package:reading_memo/resources/models/tables/user_row.dart';
 import 'package:reading_memo/resources/repositories/user_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-class AccountBloc {
+class SettingBloc {
   UserRepository _userRepository = UserRepository();
 
   final _userRowPublishSubject = PublishSubject<UserRow>();
+
   Stream<UserRow> get userRowStream => _userRowPublishSubject.stream;
 
   UserRow _userRow;
+  SessionBloc _session = SessionBloc();
 
-  AccountBloc(){
+  SettingBloc() {
     fetchAccount();
   }
 
   void fetchAccount() async {
-    User user = FirebaseAuth.instance.currentUser;
-    _userRow = await _userRepository.getByEmail(user.email);
+    _userRow = _session.currentState?.user;
     _userRowPublishSubject.sink.add(_userRow);
   }
 

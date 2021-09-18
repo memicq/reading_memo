@@ -60,5 +60,5 @@ class PhraseRow {
   }
 
   @override
-  String toString() => "PhraseRow<$phraseId:$quotedText:$bookId>";
+  String toString() => "PhraseRow<phraseId=$phraseId, quotedText=$quotedText, bookId=$bookId>";
 }

@@ -74,5 +74,5 @@ class BookRow {
   }
 
   @override
-  String toString() => 'BookRow<$bookId:$bookTitle>';
+  String toString() => 'BookRow<bookId=$bookId, bookTitle=$bookTitle>';
 }

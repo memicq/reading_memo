@@ -1,14 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:reading_memo/blocs/session_bloc.dart';
+import 'package:reading_memo/blocs/global/session_bloc.dart';
 import 'package:reading_memo/resources/models/ios_machine_identifier.dart';
 import 'package:reading_memo/resources/models/session_state.dart';
 import 'package:reading_memo/resources/models/tab_page.dart';
-import 'package:reading_memo/widgets/screens/account_screen.dart';
 import 'package:reading_memo/widgets/screens/bookshelf_screen.dart';
 import 'package:reading_memo/widgets/screens/home_screen.dart';
+import 'package:reading_memo/widgets/screens/setting_screen.dart';
 import 'package:reading_memo/widgets/screens/sign_in_screen.dart';
 import 'package:reading_memo/widgets/styles/color_const.dart';
 
@@ -17,29 +15,29 @@ class MainLayout extends StatefulWidget {
   State<StatefulWidget> createState() => MainLayoutState();
 }
 
-class MainLayoutState extends State<MainLayout>{
+class MainLayoutState extends State<MainLayout> {
   bool _needBottomSpace = true;
   bool shouldShowSignInScreen = false;
 
   int currentPage = 0;
   Map<int, TabPage> pages = {
     0: TabPage(
-        title: "ホーム",
-        baseIcon: Icons.home_outlined,
-        activeIcon: Icons.home_rounded,
-        screenWidget: HomeScreen()
+      title: "日記",
+      baseIcon: Icons.book_outlined,
+      activeIcon: Icons.book_rounded,
+      screenWidget: HomeScreen(),
     ),
     1: TabPage(
-        title: "本棚",
-        baseIcon: Icons.book_outlined,
-        activeIcon: Icons.book_rounded,
-        screenWidget: BookshelfScreen()
+      title: "本棚",
+      baseIcon: Icons.list_alt_outlined,
+      activeIcon: Icons.list_alt_rounded,
+      screenWidget: BookshelfScreen(),
     ),
     2: TabPage(
-        title: "アカウント",
-        baseIcon: Icons.account_circle_outlined,
-        activeIcon: Icons.account_circle_rounded,
-        screenWidget: AccountScreen()
+      title: "アカウント",
+      baseIcon: Icons.account_circle_outlined,
+      activeIcon: Icons.account_circle_rounded,
+      screenWidget: SettingScreen(),
     )
   };
 
@@ -57,16 +55,16 @@ class MainLayoutState extends State<MainLayout>{
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     String machineIdentifier = iosInfo.utsname.machine;
-    IosMachineIdentifier machineVer = IosMachineIdentifierExt.from(machineIdentifier);
+    IosMachineIdentifier machineVer =
+    IosMachineIdentifierExt.from(machineIdentifier);
     setState(() {
       this._needBottomSpace = machineVer.existBottomBar();
     });
   }
 
   void _checkLoginStateAfterBuild() {
-    print('MainLayout._checkLoginStateAfterBuild - ${shouldShowSignInScreen}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (shouldShowSignInScreen) SignInScreen.open(context, callback: (){});
+      if (shouldShowSignInScreen) SignInScreen.open(context, callback: () {});
     });
   }
 
@@ -82,26 +80,27 @@ class MainLayoutState extends State<MainLayout>{
         : Icon(page.baseIcon, color: ColorConst.disabledColor, size: 20);
 
     Text text = (pageNumber == this.currentPage)
-        ? Text(page.title, style: TextStyle(color: FontColorConst.activeColor, fontSize: 10))
-        : Text(page.title, style: TextStyle(color: FontColorConst.disabledColor, fontSize: 10));
+        ? Text(page.title,
+        style: TextStyle(color: FontColorConst.activeColor, fontSize: 10))
+        : Text(page.title,
+        style:
+        TextStyle(color: FontColorConst.disabledColor, fontSize: 10));
 
     return Expanded(
-        child: Container(
-            child: TextButton(
-              onPressed: (){ movePage(pageNumber); },
-              style: ButtonStyle(
-                overlayColor: MaterialStateProperty.all(ColorConst.buttonSplashColor)
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  icon,
-                  SizedBox(height: 5),
-                  text
-                ],
-              ),
-            )
-        )
+      child: Container(
+        child: TextButton(
+          onPressed: () {
+            movePage(pageNumber);
+          },
+          style: ButtonStyle(
+              overlayColor:
+              MaterialStateProperty.all(ColorConst.buttonSplashColor)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [icon, SizedBox(height: 5), text],
+          ),
+        ),
+      ),
     );
   }
 
@@ -118,13 +117,7 @@ class MainLayoutState extends State<MainLayout>{
       height: heightPx,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey
-          )
-        ]
-      ),
+          color: Colors.white, boxShadow: [BoxShadow(color: Colors.grey)]),
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: items,
@@ -132,11 +125,11 @@ class MainLayoutState extends State<MainLayout>{
     );
   }
 
-  Widget buildNotLoggedInView() {
+  Widget buildLoadingView() {
     return Scaffold(
       body: Container(
         child: Center(
-          child: Text("You're not logged in."),
+          child: CircularProgressIndicator(),
         ),
       ),
     );
@@ -144,37 +137,35 @@ class MainLayoutState extends State<MainLayout>{
 
   @override
   Widget build(BuildContext context) {
-    SessionBloc _bloc = Provider.of<SessionBloc>(context);
+    SessionBloc _bloc = SessionBloc();
 
     return StreamBuilder<SessionState>(
-        stream: _bloc.currentStateStream,
-        // initialData: SessionState(msg: 'initialData'),
-        builder: (BuildContext context, AsyncSnapshot<SessionState> snapshot) {
-            if (!snapshot.hasData) {
-              print("no snapshot");
-              return Container();
-            }
+      stream: _bloc.currentStateStream,
+      builder: (BuildContext context, AsyncSnapshot<SessionState> snapshot) {
+        _checkLoginStateAfterBuild();
+        if (!snapshot.hasData) return Container();
 
-            SessionState _session = snapshot.data;
-            print('MainLayout.build - $_session');
-            shouldShowSignInScreen = _session.shouldShowSignInScreen();
-            _checkLoginStateAfterBuild();
-
-            if (shouldShowSignInScreen) return buildNotLoggedInView();
-
-            return Scaffold(
-              body: Container(
-                child: Center(
-                  child: Column(
-                    children: [
-                      Expanded(child: pages[currentPage].screenWidget),
-                      buildBottomTab()
-                    ],
-                  ),
+        SessionState _session = snapshot.data;
+        shouldShowSignInScreen = _session.shouldShowSignInScreen();
+        if (_session.isLoading || _session.user == null) {
+          print('loading view');
+          return buildLoadingView();
+        } else {
+          print('not loading view');
+          return Scaffold(
+            body: Container(
+              child: Center(
+                child: Column(
+                  children: [
+                    Expanded(child: pages[currentPage].screenWidget),
+                    buildBottomTab()
+                  ],
                 ),
               ),
-            );
+            ),
+          );
         }
+      },
     );
   }
 }

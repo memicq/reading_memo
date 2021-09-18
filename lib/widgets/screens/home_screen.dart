@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_memo/blocs/home_bloc.dart';
-import 'package:reading_memo/blocs/session_bloc.dart';
+import 'package:reading_memo/blocs/global/session_bloc.dart';
 import 'package:reading_memo/widgets/components/home/home_template.dart';
 
 class HomeScreen extends StatelessWidget {

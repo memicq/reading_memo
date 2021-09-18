@@ -61,5 +61,5 @@ class UserRow {
   }
 
   @override
-  String toString() => "UserRow<$userId:$email>";
+  String toString() => "UserRow<userId=$userId, email=$email>";
 }

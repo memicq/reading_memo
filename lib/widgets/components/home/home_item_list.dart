@@ -9,20 +9,25 @@ import 'package:reading_memo/widgets/screens/phrase_addition_screen.dart';
 import 'home_item_list_not_found.dart';
 
 class HomeItemList extends StatelessWidget {
+  static const double _listHeight = 1000;
+
   final List<HomeItem> items;
+
   HomeItemList({@required this.items});
 
   Widget buildHomeItemList() {
+    print(items.length);
     if (items.length == 0) {
       return HomeItemListNotFound();
     } else {
       return Container(
+        height: HomeItemList._listHeight,
         width: double.infinity,
-        height: double.infinity,
-        child: ListView(
-          children: this.items.map((view) =>
-              HomeListItem(item: view)
-          ).toList(),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: items
+              .map((item) => HomeListItem(item: item))
+              .toList(growable: false),
         ),
       );
     }
@@ -32,25 +37,24 @@ class HomeItemList extends StatelessWidget {
   Widget build(BuildContext context) {
     final _bloc = Provider.of<HomeBloc>(context);
     return Container(
-      height: 1000,
+      height: HomeItemList._listHeight,
       width: double.infinity,
       child: Stack(
         children: [
           Scrollbar(
             child: SingleChildScrollView(
-                child: buildHomeItemList()
+              child: buildHomeItemList(),
             ),
           ),
           Positioned(
-              right: 15,
-              bottom: 15,
-              child: PhraseAdditionButton(
-                onPressed: () =>
-                    PhraseAdditionScreen.open(
-                        context,
-                        callback: () => _bloc.fetchHomeItems()
-                    ),
-              )
+            right: 15,
+            bottom: 15,
+            child: PhraseAdditionButton(
+              onPressed: () => PhraseAdditionScreen.open(
+                context,
+                callback: () => _bloc.fetchHomeItems(),
+              ),
+            ),
           ),
         ],
       ),
