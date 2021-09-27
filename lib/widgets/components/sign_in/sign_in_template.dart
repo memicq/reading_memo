@@ -42,16 +42,16 @@ class SignInTemplateState extends State<SignInTemplate> {
                     _session.signIn(LoginType.GOOGLE);
                   },
                 ),
-//                  SignInButton(
-//                    Buttons.Twitter,
-//                    text: "Twitter でサインイン",
-//                    onPressed: () {},
-//                  ),
-//                  SignInButton(
-//                    Buttons.FacebookNew,
-//                    text: "Facebook でサインイン",
-//                    onPressed: () {},
-//                  ),
+                // SignInButton(
+                //   Buttons.Twitter,
+                //   text: "Twitter でサインイン",
+                //   onPressed: () {},
+                // ),
+                // SignInButton(
+                //   Buttons.FacebookNew,
+                //   text: "Facebook でサインイン",
+                //   onPressed: () {},
+                // ),
                 SignInButton(
                   Buttons.AppleDark,
                   text: "Apple でサインイン",

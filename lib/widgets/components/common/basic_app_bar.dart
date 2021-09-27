@@ -3,16 +3,14 @@ import 'package:reading_memo/widgets/styles/color_const.dart';
 import 'package:reading_memo/widgets/styles/text_style_const.dart';
 
 class BasicAppBar extends StatelessWidget with PreferredSizeWidget {
-  String title;
-  Widget leading;
+  final String title;
+  final Widget leading;
 
   AppBar _appBar;
 
-  BasicAppBar({
-    @required this.title,
-    this.leading
-  }){
+  BasicAppBar({@required this.title, this.leading}) {
     _appBar = AppBar(
+      iconTheme: IconThemeData(color: Colors.black45),
       title: Text(
         this.title,
         style: TextStyleConst.appBarTitleStyle,

@@ -10,7 +10,7 @@ class HomeTemplate extends StatelessWidget {
   Widget build(BuildContext context) {
     final _bloc = Provider.of<HomeBloc>(context);
     return Scaffold(
-        appBar: BasicAppBar(title: "ホーム"),
+        appBar: BasicAppBar(title: "日記"),
         body: StreamBuilder(
           stream: _bloc.homeItemStream,
           builder: (context, snapshot) {
@@ -19,7 +19,6 @@ class HomeTemplate extends StatelessWidget {
             List<HomeItem> items = snapshot.data;
             return HomeItemList(items: items);
           },
-        )
-    );
+        ));
   }
 }

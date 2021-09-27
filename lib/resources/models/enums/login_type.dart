@@ -11,6 +11,12 @@ extension LoginTypeExt on LoginType {
     'EMAIL': LoginType.EMAIL
   };
 
+  static final japaneseNames = {
+    LoginType.GOOGLE: "Google",
+    LoginType.APPLE: "Apple",
+    LoginType.EMAIL: "メールアドレス"
+  };
+
   static LoginType fromCode(String code) {
     return LoginTypeExt.codeTypes[code];
   }
@@ -18,4 +24,6 @@ extension LoginTypeExt on LoginType {
   String get code => LoginTypeExt.codeTypes.entries
       .singleWhere((entry) => entry.value == this)
       .key;
+
+  String get japaneseName => LoginTypeExt.japaneseNames[this];
 }

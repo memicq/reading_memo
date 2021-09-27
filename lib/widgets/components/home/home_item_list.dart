@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:reading_memo/blocs/home_bloc.dart';
 import 'package:reading_memo/resources/models/home_item_view.dart';
+import 'package:reading_memo/widgets/components/common/floated_button.dart';
 import 'package:reading_memo/widgets/components/home/home_item.dart';
-import 'package:reading_memo/widgets/components/home/phrase_addition_button.dart';
 import 'package:reading_memo/widgets/screens/phrase_addition_screen.dart';
 
 import 'home_item_list_not_found.dart';
@@ -49,7 +49,8 @@ class HomeItemList extends StatelessWidget {
           Positioned(
             right: 15,
             bottom: 15,
-            child: PhraseAdditionButton(
+            child: FloatedButton(
+              icon: Icon(Icons.note_add),
               onPressed: () => PhraseAdditionScreen.open(
                 context,
                 callback: () => _bloc.fetchHomeItems(),

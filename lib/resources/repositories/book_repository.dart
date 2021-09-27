@@ -1,21 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:reading_memo/resources/models/session_state.dart';
+import 'package:reading_memo/resources/models/tables/book_row.dart';
 
 class BookRepository {
-  // for singleton
-  static final BookRepository _instance = BookRepository._internal();
-  factory BookRepository() => _instance;
-  BookRepository._internal() {
-    this._initUserDatabase();
-  }
-
   String userId;
 
-  Future<void> _initUserDatabase() async {
-    this.userId = null;
+  BookRepository({@required SessionState session}) {
+    this.userId = session.user.userId;
   }
 
-//  Future<List<Book>> list() async {
-//    final snapshot = await FirebaseFirestore.instance.collection("books").get();
-//    return snapshot.docs.map((doc) => Book.fromSnapshot(doc)).toList(growable: false);
-//  }
+  Future<List<BookRow>> list() async {
+    final snapshot = await FirebaseFirestore.instance.collection("books").get();
+    return snapshot.docs
+        .map((doc) => BookRow.fromSnapshot(doc))
+        .toList(growable: false);
+  }
 }

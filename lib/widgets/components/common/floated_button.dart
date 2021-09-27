@@ -1,9 +1,13 @@
-
 import 'package:flutter/material.dart';
 
-class PhraseAdditionButton extends StatelessWidget {
-  Function onPressed = (){};
-  PhraseAdditionButton({@required this.onPressed});
+class FloatedButton extends StatelessWidget {
+  final Function onPressed;
+  final Icon icon;
+
+  FloatedButton({
+    @required this.icon,
+    @required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +17,7 @@ class PhraseAdditionButton extends StatelessWidget {
         height: 55,
         width: 55,
         alignment: Alignment.center,
-        child: Icon(Icons.note_add),
+        child: icon,
       ),
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.all(0),

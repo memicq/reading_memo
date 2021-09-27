@@ -1,3 +1,5 @@
+import 'package:reading_memo/blocs/bloc_base.dart';
+import 'package:reading_memo/blocs/global/session_bloc.dart';
 import 'package:reading_memo/resources/models/book_selection_item.dart';
 import 'package:reading_memo/resources/models/rakuten_books_search_api_request.dart';
 import 'package:reading_memo/resources/models/rakuten_books_search_api_result.dart';
@@ -9,9 +11,9 @@ import 'package:reading_memo/resources/repositories/phrase_repository.dart';
 import 'package:reading_memo/resources/repositories/rakuten_books_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
-class PhraseAdditionBloc {
-  RakutenBooksRepository _rakutenBooksRepository = RakutenBooksRepository();
-  PhraseRepository _phraseRepository = PhraseRepository();
+class PhraseAdditionBloc extends BlocBase {
+  RakutenBooksRepository _rakutenBooksRepository;
+  PhraseRepository _phraseRepository;
 
   // publish subjects
   final _isBookSelectingPs = PublishSubject<bool>();
@@ -21,8 +23,12 @@ class PhraseAdditionBloc {
 
   // stream
   Stream<bool> get isBookSelectingStream => _isBookSelectingPs.stream;
-  Stream<BookSearchResult> get bookSearchResultStream => _bookSearchResultPs.stream;
+
+  Stream<BookSearchResult> get bookSearchResultStream =>
+      _bookSearchResultPs.stream;
+
   Stream<BookSelectionItem> get selectedItemStream => _selectedItemPs.stream;
+
   Stream<String> get phraseTextStream => _phraseTextPs.stream;
 
   // initialization
@@ -33,8 +39,11 @@ class PhraseAdditionBloc {
 
   SessionState _currentSession;
 
-  PhraseAdditionBloc(SessionState currentSession){
-    _currentSession = currentSession;
+  PhraseAdditionBloc() {
+    SessionBloc _bloc = SessionBloc();
+    _currentSession = _bloc.currentState;
+    _phraseRepository = PhraseRepository(session: _currentSession);
+    _rakutenBooksRepository = RakutenBooksRepository();
   }
 
   void fetchSelectedItem() {
@@ -49,11 +58,14 @@ class PhraseAdditionBloc {
   }
 
   Future<void> searchBooks(String query) async {
-    RakutenBooksSearchApiRequest request = RakutenBooksSearchApiRequest.fromQuery(query);
-    RakutenBooksSearchApiResult result = await _rakutenBooksRepository.search(request);
+    RakutenBooksSearchApiRequest request =
+        RakutenBooksSearchApiRequest.fromQuery(query);
+    RakutenBooksSearchApiResult result =
+        await _rakutenBooksRepository.search(request);
 
-    List<BookSelectionItem> items = result.items.map((i) =>
-        BookSelectionItem.fromRakutenBooksSearchApiResultItem(i)).toList();
+    List<BookSelectionItem> items = result.items
+        .map((i) => BookSelectionItem.fromRakutenBooksSearchApiResultItem(i))
+        .toList();
 
     _result.isSearchedOnce = true;
     _result.items = items;
@@ -82,8 +94,7 @@ class PhraseAdditionBloc {
         referenceUrl: _selectedItem.itemUrl,
         imageUrl: _selectedItem.largeImageUrl,
         createdAt: DateTime.now(),
-        updatedAt: DateTime.now()
-    );
+        updatedAt: DateTime.now());
 
     PhraseRow _phrase = PhraseRow(
         generateId: true,
@@ -92,8 +103,7 @@ class PhraseAdditionBloc {
         bookId: _book.bookId,
         postedUserId: _currentSession.user.userId,
         createdAt: DateTime.now(),
-        updatedAt: DateTime.now()
-    );
+        updatedAt: DateTime.now());
 
     await _phraseRepository.create(_phrase, _book);
   }

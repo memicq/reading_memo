@@ -19,7 +19,7 @@ class MainLayoutState extends State<MainLayout> {
   bool _needBottomSpace = true;
   bool shouldShowSignInScreen = false;
 
-  int currentPage = 0;
+  int currentPage = 1;
   Map<int, TabPage> pages = {
     0: TabPage(
       title: "日記",
@@ -56,7 +56,7 @@ class MainLayoutState extends State<MainLayout> {
     IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
     String machineIdentifier = iosInfo.utsname.machine;
     IosMachineIdentifier machineVer =
-    IosMachineIdentifierExt.from(machineIdentifier);
+        IosMachineIdentifierExt.from(machineIdentifier);
     setState(() {
       this._needBottomSpace = machineVer.existBottomBar();
     });
@@ -81,10 +81,10 @@ class MainLayoutState extends State<MainLayout> {
 
     Text text = (pageNumber == this.currentPage)
         ? Text(page.title,
-        style: TextStyle(color: FontColorConst.activeColor, fontSize: 10))
+            style: TextStyle(color: FontColorConst.activeColor, fontSize: 10))
         : Text(page.title,
-        style:
-        TextStyle(color: FontColorConst.disabledColor, fontSize: 10));
+            style:
+                TextStyle(color: FontColorConst.disabledColor, fontSize: 10));
 
     return Expanded(
       child: Container(
@@ -94,7 +94,7 @@ class MainLayoutState extends State<MainLayout> {
           },
           style: ButtonStyle(
               overlayColor:
-              MaterialStateProperty.all(ColorConst.buttonSplashColor)),
+                  MaterialStateProperty.all(ColorConst.buttonSplashColor)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [icon, SizedBox(height: 5), text],
