@@ -1,44 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:reading_memo/blocs/book_addition_bloc.dart';
+import 'package:reading_memo/resources/models/views/phrase_addition/book_search_result.dart';
 import 'package:reading_memo/widgets/components/common/basic_app_bar.dart';
+import 'package:reading_memo/widgets/components/common/book_selection_area/common_book_selection_input_area.dart';
+import 'package:reading_memo/widgets/components/common/book_selection_area/common_book_selection_result_list.dart';
 
 class BookAdditionTemplate extends StatelessWidget {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).requestFocus(_focusNode);
+    BookAdditionBloc _bloc = Provider.of<BookAdditionBloc>(context);
 
     return Scaffold(
       appBar: BasicAppBar(
         title: "本を追加",
       ),
       body: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(color: Colors.black26),
-          ),
-        ),
-        child: TextField(
-          controller: _controller,
-          focusNode: _focusNode,
-          keyboardType: TextInputType.text,
-          decoration: const InputDecoration(
-            prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 15, right: 5),
-              child: Text(
-                "本を検索:",
-                style: TextStyle(color: Colors.black87, fontSize: 16),
-              ),
+        child: Column(
+          children: [
+            CommonBookSelectionInputArea(
+              search: (query) => _bloc.searchBooks(query),
             ),
-            prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
-            hintText: "タイトルや著者名、ISBNコードで検索",
-            hintStyle: TextStyle(color: Colors.black26),
-            border: InputBorder.none,
-          ),
-          // onEditingComplete: () => _bloc.searchBooks(_controller.value.text),
+            Expanded(
+              child: StreamBuilder<BookSearchResult>(
+                stream: _bloc.bookSearchResultStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return Container();
+
+                  BookSearchResult _result = snapshot.data;
+                  return CommonBookSelectionResultList(
+                    result: _result,
+                    selectBook: (item) => _bloc.selectBook(item),
+                  );
+                },
+              ),
+            )
+          ],
         ),
       ),
     );

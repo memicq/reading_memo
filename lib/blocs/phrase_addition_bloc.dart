@@ -86,24 +86,27 @@ class PhraseAdditionBloc extends BlocBase {
 
   Future<void> savePhraseText() async {
     BookRow _book = BookRow(
-        generateId: true,
-        isbnCode10: _selectedItem.isbn,
-        isbnCode13: null,
-        bookTitle: _selectedItem.title,
-        authors: _selectedItem.author.split(','),
-        referenceUrl: _selectedItem.itemUrl,
-        imageUrl: _selectedItem.largeImageUrl,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now());
+      generateId: true,
+      isbnCode10: _selectedItem.isbn,
+      isbnCode13: null,
+      bookTitle: _selectedItem.title,
+      authors: _selectedItem.author.split(','),
+      publisherName: _selectedItem.publisherName,
+      referenceUrl: _selectedItem.itemUrl,
+      imageUrl: _selectedItem.largeImageUrl,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
 
     PhraseRow _phrase = PhraseRow(
-        generateId: true,
-        quotedText: _phraseText,
-        pageNumber: '123',
-        bookId: _book.bookId,
-        postedUserId: _currentSession.user.userId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now());
+      generateId: true,
+      quotedText: _phraseText,
+      pageNumber: '123',
+      bookId: _book.bookId,
+      postedUserId: _currentSession.user.userId,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
 
     await _phraseRepository.create(_phrase, _book);
   }

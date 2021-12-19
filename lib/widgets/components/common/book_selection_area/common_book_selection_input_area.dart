@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:reading_memo/blocs/phrase_addition_bloc.dart';
+import 'package:flutter/widgets.dart';
 
-class BookSelectionArea extends StatelessWidget {
+class CommonBookSelectionInputArea extends StatelessWidget {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
+  final Function(String) search;
+
+  CommonBookSelectionInputArea({@required this.search});
+
   @override
   Widget build(BuildContext context) {
-    final _bloc = Provider.of<PhraseAdditionBloc>(context, listen: false);
     FocusScope.of(context).requestFocus(_focusNode);
 
     return Container(
@@ -35,7 +37,7 @@ class BookSelectionArea extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.black26),
           border: InputBorder.none,
         ),
-        onEditingComplete: () => _bloc.searchBooks(_controller.value.text),
+        onEditingComplete: () => search(_controller.value.text),
       ),
     );
   }

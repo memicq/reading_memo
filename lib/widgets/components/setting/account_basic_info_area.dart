@@ -18,13 +18,10 @@ class AccountBasicInfoArea extends StatelessWidget {
         UserRow _user = (snapshot.data as SessionState)?.user;
         return SettingItemPageLink(
           content: Column(
-            children: [
-              Text(_user.displayName),
-              Text(_user.loginType.japaneseName + "でログイン")
-            ],
+            children: [Text(_user.displayName), Text(_user.loginType.japaneseName + "でログイン")],
           ),
           iconData: Icons.account_circle_rounded,
-          templateScaffold: AccountEditTemplate(user: _user),
+          screen: AccountEditTemplate(user: _user),
           needTopSpace: true,
         );
       },

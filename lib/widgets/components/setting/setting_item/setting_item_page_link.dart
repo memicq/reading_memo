@@ -4,14 +4,14 @@ import 'package:flutter/widgets.dart';
 class SettingItemPageLink extends StatelessWidget {
   final Widget content;
   final IconData iconData;
-  final Widget templateScaffold;
+  final Widget screen;
   final bool needTopSpace;
   final bool needBottomSpace;
 
   SettingItemPageLink({
     @required this.content,
     @required this.iconData,
-    @required this.templateScaffold,
+    @required this.screen,
     this.needTopSpace = false,
     this.needBottomSpace = false,
   });
@@ -31,8 +31,7 @@ class SettingItemPageLink extends StatelessWidget {
         color: Colors.white,
         child: InkWell(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => this.templateScaffold));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => this.screen));
           },
           child: Container(
             decoration: BoxDecoration(

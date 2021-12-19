@@ -16,7 +16,6 @@ class HomeItemList extends StatelessWidget {
   HomeItemList({@required this.items});
 
   Widget buildHomeItemList() {
-    print(items.length);
     if (items.length == 0) {
       return HomeItemListNotFound();
     } else {

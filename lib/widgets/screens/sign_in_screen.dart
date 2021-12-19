@@ -15,17 +15,12 @@ class SignInScreen extends StatelessWidget {
   }
 
   static void open(BuildContext context, {@required void Function() callback}) {
-    print('SignInScreen.open');
-    Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) => SignInScreen(),
-            fullscreenDialog: true
-        )
-    ).then((value) => callback());
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => SignInScreen(), fullscreenDialog: true))
+        .then((value) => callback());
   }
 
   static void close(BuildContext context) {
-    print('SignInScreen.close');
     Navigator.of(context).pop();
   }
 }

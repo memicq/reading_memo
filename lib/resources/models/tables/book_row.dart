@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:reading_memo/utils/unique_id_util.dart';
-import 'package:uuid/uuid_util.dart';
 
 class BookRow {
   String bookId;
@@ -9,6 +8,7 @@ class BookRow {
   String isbnCode13;
   String bookTitle;
   List<String> authors;
+  String publisherName;
   String referenceUrl;
   String imageUrl;
   DateTime createdAt;
@@ -23,15 +23,15 @@ class BookRow {
     String isbnCode13,
     @required this.bookTitle,
     @required this.authors,
+    @required this.publisherName,
     @required this.referenceUrl,
     @required this.imageUrl,
     @required this.createdAt,
-    @required this.updatedAt
-  }): assert(bookId != null || generateId == true),
+    @required this.updatedAt,
+  })  : assert(bookId != null || generateId == true),
         assert(isbnCode10 != null || isbnCode13 != null),
         this.isbnCode10 = isbnCode10,
-        this.isbnCode13 = isbnCode13
-  {
+        this.isbnCode13 = isbnCode13 {
     if (bookId != null) {
       this.bookId = bookId;
     } else {
@@ -52,13 +52,13 @@ class BookRow {
         this.isbnCode13 = map['isbnCode13'],
         this.bookTitle = map['bookTitle'],
         this.authors = (map['authors'] as String).split(','),
+        this.publisherName = map['publisherName'],
         this.referenceUrl = map['referenceUrl'],
         this.imageUrl = map['imageUrl'],
         this.createdAt = map['createdAt'].toDate(),
         this.updatedAt = map['updatedAt'].toDate();
 
-  BookRow.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.data(), reference: snapshot.reference);
+  BookRow.fromSnapshot(DocumentSnapshot snapshot) : this.fromMap(snapshot.data(), reference: snapshot.reference);
 
   Map<String, dynamic> toMap() {
     return {
@@ -66,6 +66,7 @@ class BookRow {
       'isbnCode13': this.isbnCode13,
       'bookTitle': this.bookTitle,
       'authors': this.authors.join(','),
+      'publisherName': this.publisherName,
       'referenceUrl': this.referenceUrl,
       'imageUrl': this.imageUrl,
       'createdAt': this.createdAt,

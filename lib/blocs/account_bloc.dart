@@ -1,14 +1,12 @@
 import 'package:reading_memo/blocs/global/session_bloc.dart';
 import 'package:reading_memo/resources/models/tables/user_row.dart';
-import 'package:reading_memo/resources/repositories/user_repository.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SettingBloc {
-  UserRepository _userRepository = UserRepository();
+  // ps
+  final PublishSubject<UserRow> _userRowPs = PublishSubject<UserRow>();
 
-  final _userRowPublishSubject = PublishSubject<UserRow>();
-
-  Stream<UserRow> get userRowStream => _userRowPublishSubject.stream;
+  Stream<UserRow> get userRowStream => _userRowPs.stream;
 
   UserRow _userRow;
   SessionBloc _session = SessionBloc();
@@ -19,10 +17,10 @@ class SettingBloc {
 
   void fetchAccount() async {
     _userRow = _session.currentState?.user;
-    _userRowPublishSubject.sink.add(_userRow);
+    _userRowPs.sink.add(_userRow);
   }
 
   void dispose() {
-    _userRowPublishSubject.close();
+    _userRowPs.close();
   }
 }
